@@ -27,3 +27,27 @@ func TestFirst(t *testing.T) {
 		}
 	})
 }
+
+func BenchmarkFirst(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		it := First(Int(1, 1000), func(i int) bool {
+			return i%500 == 0
+		}).Iterator()
+
+		for v := range it {
+			_ = v
+		}
+	}
+	b.ReportAllocs()
+}
+
+func BenchmarkFirstNative(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for j := 1; j <= 1000; j++ {
+			if j%500 == 0 {
+				break
+			}
+		}
+	}
+	b.ReportAllocs()
+}
