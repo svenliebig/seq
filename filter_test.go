@@ -39,6 +39,7 @@ func BenchmarkFilterEmpty(b *testing.B) {
 	b.ReportAllocs()
 }
 
+// PUZZLE: this allocates 2 times, while the previous benchmark allocates 0 times
 func BenchmarkFilterEmptyIterator(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Filter(
@@ -51,7 +52,21 @@ func BenchmarkFilterEmptyIterator(b *testing.B) {
 	b.ReportAllocs()
 }
 
-func BenchmarkFilterTest(b *testing.B) {
+// 2 allocs
+func BenchmarkFilterIntDeclaration(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = Filter(
+			Int(0, 1000),
+			func(i int) bool {
+				return i%2 == 0
+			},
+		)
+	}
+	b.ReportAllocs()
+}
+
+// 4 allocs
+func BenchmarkFilterIntDeclarationIterator(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Filter(
 			Int(0, 1000),
@@ -63,20 +78,46 @@ func BenchmarkFilterTest(b *testing.B) {
 	b.ReportAllocs()
 }
 
-func BenchmarkFilter(b *testing.B) {
+func dummy(i int) {
+}
+
+// 9 allocs
+func BenchmarkFilterIntDeclarationIteratorRange(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		s := Filter(
+		it := Filter(
 			Int(0, 1000),
 			func(i int) bool {
 				return i%2 == 0
 			},
-		)
+		).Iterator()
 
-		target := make([]int, 0, 500)
+		for v := range it {
+			dummy(v)
+		}
+	}
+	b.ReportAllocs()
+}
 
-		for v := range s.Iterator() {
+// PUZZLE: 11 allocs/op
+func BenchmarkFilter(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		// 4 allocs
+		it := Filter(
+			Int(0, 1000),
+			func(i int) bool {
+				return i%2 == 0
+			},
+		).Iterator()
+
+		// 1 alloc
+		target := make([]int, 0, 501)
+
+		// 5 allocs
+		for v := range it {
 			target = append(target, v)
 		}
+
+		// ?? last alloc
 	}
 	b.ReportAllocs()
 }
