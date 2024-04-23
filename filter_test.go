@@ -7,7 +7,7 @@ import (
 
 func TestFilter(t *testing.T) {
 	s := Filter(
-		intSeq{0, 10},
+		Int(0, 10),
 		func(i int) bool {
 			return i%2 == 0
 		},
