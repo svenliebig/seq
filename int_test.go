@@ -32,3 +32,25 @@ func TestIntSeq(t *testing.T) {
 		}
 	})
 }
+
+func BenchmarkIntSeq(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		it := Int(0, 1000).Iterator()
+
+		target := make([]int, 0, 1000)
+
+		for i := range it {
+			target = append(target, i)
+		}
+	}
+}
+
+func BenchmarkIntNative(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		target := make([]int, 0, 1000)
+
+		for i := 0; i <= 1000; i++ {
+			target = append(target, i)
+		}
+	}
+}
