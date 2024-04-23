@@ -10,7 +10,7 @@ type reduceSeq[T, U any] struct {
 }
 
 func Reduce[T, U any](s Seq[T], f func(U, T) U) Seq[U] {
-	return &reduceSeq[T, U]{f, s.Iterator()}
+	return reduceSeq[T, U]{f, s.Iterator()}
 }
 
 func (s reduceSeq[T, U]) Iterator() iter.Seq[U] {
