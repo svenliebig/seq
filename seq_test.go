@@ -77,11 +77,6 @@ func TestSeq(t *testing.T) {
 	})
 }
 
-func TestAsync(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-	})
-}
-
 func BenchmarkSeqCreateMapFilterCollect(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Collect(
