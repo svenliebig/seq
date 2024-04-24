@@ -7,12 +7,16 @@ import (
 
 func TestReduce(t *testing.T) {
 	t.Run("should sum integers", func(t *testing.T) {
-		result := Reduce(
+		result, err := Reduce(
 			Int(0, 5),
-			func(acc, v int) int {
-				return acc + v
+			func(acc, v int) (int, error) {
+				return acc + v, nil
 			},
 		)
+
+		if err != nil {
+			t.Errorf("Expected nil, got %v", err)
+		}
 
 		if result != 15 {
 			t.Errorf("Expected 15, got %d", result)
@@ -20,12 +24,16 @@ func TestReduce(t *testing.T) {
 	})
 
 	t.Run("should append integers to a string", func(t *testing.T) {
-		result := Reduce(
+		result, err := Reduce(
 			Int(0, 5),
-			func(acc string, v int) string {
-				return acc + fmt.Sprint(v)
+			func(acc string, v int) (string, error) {
+				return acc + fmt.Sprint(v), nil
 			},
 		)
+
+		if err != nil {
+			t.Errorf("Expected nil, got %v", err)
+		}
 
 		if result != "012345" {
 			t.Errorf("Expected 012345, got %s", result)
@@ -37,8 +45,8 @@ func BenchmarkReduce(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Reduce(
 			Int(0, 1000),
-			func(acc, v int) int {
-				return acc + v
+			func(acc, v int) (int, error) {
+				return acc + v, nil
 			},
 		)
 	}

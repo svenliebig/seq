@@ -6,14 +6,14 @@ import (
 
 func TestFirst(t *testing.T) {
 	t.Run("should get the 5 in the integer sequence", func(t *testing.T) {
-		it := First(Int(1, 10), func(i int) bool {
-			return i%5 == 0
+		it := First(Int(1, 10), func(i int) (bool, error) {
+			return i%5 == 0, nil
 		}).Iterator()
 
 		result := 0
 		iterations := 0
 
-		for v := range it {
+		for v, _ := range it {
 			result = v
 			iterations++
 		}
@@ -30,11 +30,11 @@ func TestFirst(t *testing.T) {
 
 func BenchmarkFirst(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		it := First(Int(1, 1000), func(i int) bool {
-			return i%500 == 0
+		it := First(Int(1, 1000), func(i int) (bool, error) {
+			return i%500 == 0, nil
 		}).Iterator()
 
-		for v := range it {
+		for v, _ := range it {
 			_ = v
 		}
 	}

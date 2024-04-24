@@ -14,7 +14,7 @@ func TestSkip(t *testing.T) {
 
 		var result int
 		iterations := 0
-		for v := range it {
+		for v, _ := range it {
 			result = v
 			iterations++
 		}
@@ -35,7 +35,7 @@ func TestSkip(t *testing.T) {
 		).Iterator()
 
 		result := ""
-		for v := range it {
+		for v, _ := range it {
 			result += fmt.Sprint(v)
 		}
 

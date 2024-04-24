@@ -9,15 +9,20 @@ func TestFilter(t *testing.T) {
 	t.Run("should filter even numbers", func(t *testing.T) {
 		s := Filter(
 			Int(0, 10),
-			func(i int) bool {
-				return i%2 == 0
+			func(i int) (bool, error) {
+				return i%2 == 0, nil
 			},
 		)
 
 		res := ""
 		expected := "0246810"
 
-		for v := range s.Iterator() {
+		for v, err := range s.Iterator() {
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
 			res += fmt.Sprint(v)
 		}
 
@@ -31,8 +36,8 @@ func BenchmarkFilterEmpty(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Filter(
 			Empty(),
-			func(i any) bool {
-				return true
+			func(i any) (bool, error) {
+				return true, nil
 			},
 		)
 	}
@@ -44,8 +49,8 @@ func BenchmarkFilterEmptyIterator(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Filter(
 			Empty(),
-			func(i any) bool {
-				return true
+			func(i any) (bool, error) {
+				return true, nil
 			},
 		).Iterator()
 	}
@@ -57,8 +62,8 @@ func BenchmarkFilterIntDeclaration(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Filter(
 			Int(0, 1000),
-			func(i int) bool {
-				return i%2 == 0
+			func(i int) (bool, error) {
+				return i%2 == 0, nil
 			},
 		)
 	}
@@ -70,8 +75,8 @@ func BenchmarkFilterIntDeclarationIterator(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Filter(
 			Int(0, 1000),
-			func(i int) bool {
-				return i%2 == 0
+			func(i int) (bool, error) {
+				return i%2 == 0, nil
 			},
 		).Iterator()
 	}
@@ -86,12 +91,12 @@ func BenchmarkFilterIntDeclarationIteratorRange(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		it := Filter(
 			Int(0, 1000),
-			func(i int) bool {
-				return i%2 == 0
+			func(i int) (bool, error) {
+				return i%2 == 0, nil
 			},
 		).Iterator()
 
-		for v := range it {
+		for v, _ := range it {
 			dummy(v)
 		}
 	}
@@ -104,8 +109,8 @@ func BenchmarkFilter(b *testing.B) {
 		// 4 allocs
 		it := Filter(
 			Int(0, 1000),
-			func(i int) bool {
-				return i%2 == 0
+			func(i int) (bool, error) {
+				return i%2 == 0, nil
 			},
 		).Iterator()
 
@@ -113,7 +118,7 @@ func BenchmarkFilter(b *testing.B) {
 		target := make([]int, 0, 501)
 
 		// 5 allocs
-		for v := range it {
+		for v, _ := range it {
 			target = append(target, v)
 		}
 
