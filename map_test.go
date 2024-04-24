@@ -67,7 +67,8 @@ func TestAsyncError(t *testing.T) {
 				},
 			),
 		)
-		if err != nil {
+
+		if err == nil {
 			t.Errorf("Expected an error, got nil")
 		}
 	})
