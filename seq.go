@@ -7,5 +7,5 @@ import (
 type Iterator[T any] iter.Seq2[T, error]
 
 type Seq[T any] interface {
-	Iterator() Iterator[T]
+	Iterator() iter.Seq2[T, error]
 }

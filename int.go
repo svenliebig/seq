@@ -1,5 +1,7 @@
 package seq
 
+import "iter"
+
 var IntSeq Seq[int] = intSeq{}
 
 type intSeq struct {
@@ -15,7 +17,7 @@ func Int(start, end int) Seq[int] {
 	return intSeq{start, end}
 }
 
-func (s intSeq) Iterator() Iterator[int] {
+func (s intSeq) Iterator() iter.Seq2[int, error] {
 	return func(yield func(int, error) bool) {
 		if s.start > s.end {
 			for i := s.start; i >= s.end; i-- {

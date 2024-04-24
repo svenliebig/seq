@@ -28,3 +28,13 @@ func TestTake(t *testing.T) {
 		}
 	})
 }
+
+func BenchmarkTake(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = Collect(Take(
+			Int(0, 1000),
+			500,
+		))
+	}
+	b.ReportAllocs()
+}

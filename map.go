@@ -3,6 +3,7 @@ package seq
 import (
 	"context"
 	"fmt"
+	"iter"
 	"sync"
 )
 
@@ -10,14 +11,14 @@ type mapfunc[T, U any] func(T) (U, error)
 
 type mapSeq[T, U any] struct {
 	f mapfunc[T, U]
-	i Iterator[T]
+	i iter.Seq2[T, error]
 }
 
 func Map[T, U any](s Seq[T], f mapfunc[T, U]) Seq[U] {
 	return mapSeq[T, U]{f, s.Iterator()}
 }
 
-func (s mapSeq[T, U]) Iterator() Iterator[U] {
+func (s mapSeq[T, U]) Iterator() iter.Seq2[U, error] {
 	return func(yield func(U, error) bool) {
 		var r U
 
@@ -38,17 +39,18 @@ func (s mapSeq[T, U]) Iterator() Iterator[U] {
 
 type mapAsyncSeq[T, U any] struct {
 	f mapfunc[T, U]
-	i Iterator[T]
+	i iter.Seq2[T, error]
 }
 
 func MapAsync[T, U any](s Seq[T], f mapfunc[T, U]) Seq[U] {
 	return mapAsyncSeq[T, U]{f, s.Iterator()}
 }
 
-func (s mapAsyncSeq[T, U]) Iterator() Iterator[U] {
+func (s mapAsyncSeq[T, U]) Iterator() iter.Seq2[U, error] {
 	return func(yield func(U, error) bool) {
 		var r U
 		var wg sync.WaitGroup
+		var l sync.Mutex
 
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -69,6 +71,7 @@ func (s mapAsyncSeq[T, U]) Iterator() Iterator[U] {
 
 				r, err := s.f(v)
 
+				l.Lock()
 				select {
 				case <-ctx.Done():
 					fmt.Println("❌ context done", v, err)
@@ -80,8 +83,10 @@ func (s mapAsyncSeq[T, U]) Iterator() Iterator[U] {
 						cancel()
 					}
 				}
+				l.Unlock()
 			}(v)
 
+			// when I remove this, I run into a deadlock
 			select {
 			case <-ctx.Done():
 				fmt.Println("😱 ctx done", v, err)

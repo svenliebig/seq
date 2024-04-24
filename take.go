@@ -1,7 +1,11 @@
 package seq
 
+import (
+	"iter"
+)
+
 type takeSeq[T any] struct {
-	i Iterator[T]
+	i iter.Seq2[T, error]
 	n int
 }
 
@@ -10,20 +14,24 @@ func Take[T any](s Seq[T], n int) Seq[T] {
 	return takeSeq[T]{s.Iterator(), n}
 }
 
-func (s takeSeq[T]) Iterator() Iterator[T] {
+func (s takeSeq[T]) Iterator() iter.Seq2[T, error] {
 	return func(yield func(T, error) bool) {
-		for v, err := range s.i {
+		next, stop := iter.Pull2(s.i)
+		defer stop()
+
+		for s.n > 0 {
+			v, err, valid := next()
+			s.n--
+
+			if !valid {
+				return
+			}
+
 			if err != nil {
 				if !yield(v, err) {
 					return
 				}
 			}
-
-			if s.n == 0 {
-				return
-			}
-
-			s.n--
 
 			if !yield(v, nil) {
 				return
