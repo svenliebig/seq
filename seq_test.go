@@ -1,8 +1,59 @@
 package seq
 
 import (
+	"fmt"
 	"testing"
 )
+
+func TestSeq(t *testing.T) {
+	t.Run("should correctly raise errors in a Collect, Filter chain", func(t *testing.T) {
+		_, err := Collect(
+			Filter(
+				Int(0, 3),
+				func(i int) (bool, error) {
+					if i == 2 {
+						return false, fmt.Errorf("error")
+					}
+
+					return true, nil
+				},
+			))
+
+		if err == nil {
+			t.Errorf("Expected an error, got nil")
+		}
+	})
+
+	t.Run("should correctly raise errors in a Collect, First, Skip, Take, Filter chain", func(t *testing.T) {
+		_, err := Collect(
+			First(
+				Skip(
+					Take(
+						Filter(
+							Int(0, 10),
+							func(i int) (bool, error) {
+								if i == 8 {
+									return false, fmt.Errorf("error")
+								}
+
+								return true, nil
+							},
+						),
+						8,
+					),
+					5,
+				),
+				func(i int) (bool, error) {
+					return i == 8, nil
+				},
+			),
+		)
+
+		if err == nil {
+			t.Errorf("Expected an error, got nil")
+		}
+	})
+}
 
 func BenchmarkSeqCreateMapFilterCollect(b *testing.B) {
 	for i := 0; i < b.N; i++ {

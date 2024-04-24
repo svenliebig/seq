@@ -13,7 +13,11 @@ func TestTake(t *testing.T) {
 		).Iterator()
 
 		var result string
-		for v, _ := range it {
+		for v, err := range it {
+			if err != nil {
+				t.Errorf("Expected nil, got %v", err)
+			}
+
 			result += fmt.Sprint(v)
 		}
 

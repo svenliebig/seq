@@ -1,12 +1,12 @@
 package seq
 
 type firstSeq[T any] struct {
-	p func(T) bool
+	p predicate[T]
 	i Iterator[T]
 }
 
 // First returns the first element in the sequence that satisfies the predicate.
-func First[T any](s Seq[T], p func(T) bool) Seq[T] {
+func First[T any](s Seq[T], p predicate[T]) Seq[T] {
 	return firstSeq[T]{p, s.Iterator()}
 }
 
@@ -19,7 +19,15 @@ func (s firstSeq[T]) Iterator() Iterator[T] {
 				}
 			}
 
-			if s.p(v) {
+			r, err := s.p(v)
+
+			if err != nil {
+				if !yield(v, err) {
+					return
+				}
+			}
+
+			if r {
 				yield(v, nil)
 				return
 			}
