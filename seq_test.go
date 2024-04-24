@@ -53,6 +53,33 @@ func TestSeq(t *testing.T) {
 			t.Errorf("Expected an error, got nil")
 		}
 	})
+
+	t.Run("should correctly raise errors in a Reduce, Map chain", func(t *testing.T) {
+		_, err := Reduce(
+			Map(
+				Int(0, 10),
+				func(i int) (string, error) {
+					if i == 5 {
+						return "", fmt.Errorf("error")
+					}
+
+					return fmt.Sprintf("%d", i), nil
+				},
+			),
+			func(acc string, i string) (string, error) {
+				return acc + i, nil
+			},
+		)
+
+		if err == nil {
+			t.Errorf("Expected an error, got nil")
+		}
+	})
+}
+
+func TestAsync(t *testing.T) {
+	t.Run("", func(t *testing.T) {
+	})
 }
 
 func BenchmarkSeqCreateMapFilterCollect(b *testing.B) {
@@ -63,7 +90,7 @@ func BenchmarkSeqCreateMapFilterCollect(b *testing.B) {
 					Int(0, 10000),
 					func(i int) (bool, error) { return i%2 == 0, nil },
 				),
-				func(i int) int { return i * 2 },
+				func(i int) (int, error) { return i * 2, nil },
 			),
 		)
 	}

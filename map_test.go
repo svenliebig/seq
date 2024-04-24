@@ -8,18 +8,18 @@ func TestMap(t *testing.T) {
 	t.Run("should map integer values to strings", func(t *testing.T) {
 		s := Map(
 			Int(3, 0),
-			func(i int) string {
+			func(i int) (string, error) {
 				switch i {
 				case 0:
-					return "Zero"
+					return "Zero", nil
 				case 1:
-					return "One"
+					return "One", nil
 				case 2:
-					return "Two"
+					return "Two", nil
 				case 3:
-					return "Three"
+					return "Three", nil
 				default:
-					return "Unknown"
+					return "Unknown", nil
 				}
 			},
 		)
