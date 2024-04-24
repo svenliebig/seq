@@ -27,7 +27,7 @@ func TestMap(t *testing.T) {
 		res := ""
 		expected := "ThreeTwoOneZero"
 
-		for v := range s.Iterator() {
+		for v, _ := range s.Iterator() {
 			res += v
 		}
 

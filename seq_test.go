@@ -10,7 +10,7 @@ func BenchmarkSeqCreateMapFilterCollect(b *testing.B) {
 			Map(
 				Filter(
 					Int(0, 10000),
-					func(i int) bool { return i%2 == 0 },
+					func(i int) (bool, error) { return i%2 == 0, nil },
 				),
 				func(i int) int { return i * 2 },
 			),

@@ -13,7 +13,7 @@ func TestTake(t *testing.T) {
 		).Iterator()
 
 		var result string
-		for v := range it {
+		for v, _ := range it {
 			result += fmt.Sprint(v)
 		}
 

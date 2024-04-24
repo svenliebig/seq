@@ -8,7 +8,7 @@ func TestEmpty(t *testing.T) {
 	t.Run("should not call any iteration", func(t *testing.T) {
 		s := Empty()
 
-		for v := range s.Iterator() {
+		for v, _ := range s.Iterator() {
 			t.Errorf("Expected no iteration, got %v", v)
 		}
 	})

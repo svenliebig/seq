@@ -13,7 +13,7 @@ func TestFirst(t *testing.T) {
 		result := 0
 		iterations := 0
 
-		for v := range it {
+		for v, _ := range it {
 			result = v
 			iterations++
 		}
@@ -34,7 +34,7 @@ func BenchmarkFirst(b *testing.B) {
 			return i%500 == 0
 		}).Iterator()
 
-		for v := range it {
+		for v, _ := range it {
 			_ = v
 		}
 	}

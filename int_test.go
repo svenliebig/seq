@@ -10,7 +10,7 @@ func TestIntSeq(t *testing.T) {
 		it := Int(0, 4).Iterator()
 
 		result := ""
-		for i := range it {
+		for i, _ := range it {
 			result += fmt.Sprint(i)
 		}
 
@@ -23,7 +23,7 @@ func TestIntSeq(t *testing.T) {
 		it := Int(4, 0).Iterator()
 
 		result := ""
-		for i := range it {
+		for i, _ := range it {
 			result += fmt.Sprint(i)
 		}
 
@@ -39,7 +39,7 @@ func BenchmarkIntSeq(b *testing.B) {
 
 		target := make([]int, 0, 1000)
 
-		for i := range it {
+		for i, _ := range it {
 			target = append(target, i)
 		}
 	}

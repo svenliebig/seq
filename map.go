@@ -1,22 +1,24 @@
 package seq
 
-import (
-	"iter"
-)
-
 type mapSeq[T, U any] struct {
 	f func(T) U
-	i iter.Seq[T]
+	i Iterator[T]
 }
 
 func Map[T, U any](s Seq[T], f func(T) U) Seq[U] {
 	return mapSeq[T, U]{f, s.Iterator()}
 }
 
-func (s mapSeq[T, U]) Iterator() iter.Seq[U] {
-	return func(yield func(U) bool) {
-		for e := range s.i {
-			if !yield(s.f(e)) {
+func (s mapSeq[T, U]) Iterator() Iterator[U] {
+	return func(yield func(U, error) bool) {
+		for v, err := range s.i {
+			if err != nil {
+				if !yield(s.f(v), err) {
+					return
+				}
+			}
+
+			if !yield(s.f(v), nil) {
 				return
 			}
 		}
