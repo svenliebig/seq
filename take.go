@@ -31,9 +31,7 @@ func (s takeSeq[T]) Iterator() iter.Seq2[T, error] {
 				if !yield(v, err) {
 					return
 				}
-			}
-
-			if !yield(v, nil) {
+			} else if !yield(v, nil) {
 				return
 			}
 		}
