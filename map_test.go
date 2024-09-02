@@ -74,15 +74,13 @@ func TestAsyncError(t *testing.T) {
 	})
 }
 
-// probably not possible to keep the order?
-func TestAsyncOrder(t *testing.T) {
+func TestAsyncContent(t *testing.T) {
 	t.Run("should map async over some numbers", func(t *testing.T) {
 		r, err := Collect(
 			MapAsync(
 				Int(0, 10),
 				func(i int) (int, error) {
 					// wait for 1 second
-					fmt.Println("Processing", i)
 					time.Sleep(1 * time.Second)
 
 					return i * 2, nil
@@ -95,9 +93,18 @@ func TestAsyncOrder(t *testing.T) {
 		}
 
 		expected := []int{0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20}
-		for i, v := range r {
-			if v != expected[i] {
-				t.Errorf("Expected %d, got %d", expected[i], v)
+		for _, v := range r {
+			present := false
+			for i, e := range expected {
+				if v == e {
+					present = true
+					expected = append(expected[:i], expected[i+1:]...)
+					break
+				}
+			}
+
+			if !present {
+				t.Errorf("expected %d to be in the array %v but it wasn't", v, expected)
 			}
 		}
 	})

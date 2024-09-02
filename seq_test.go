@@ -32,11 +32,15 @@ func TestSeq(t *testing.T) {
 						Filter(
 							Int(0, 10),
 							func(i int) (bool, error) {
+								if i < 2 {
+									return true, nil
+								}
+
 								if i == 8 {
 									return false, fmt.Errorf("error")
 								}
 
-								return true, nil
+								return false, nil
 							},
 						),
 						8,

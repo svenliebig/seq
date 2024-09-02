@@ -2,7 +2,6 @@ package seq
 
 import (
 	"context"
-	"fmt"
 	"iter"
 	"sync"
 )
@@ -55,8 +54,10 @@ func (s mapAsyncSeq[T, U]) Iterator() iter.Seq2[U, error] {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
+		// channel to replace sync.Mutex
+		// optional: fail fast mode
+
 		for v, err := range s.i {
-			fmt.Println("going over: ", v, err)
 			wg.Add(1)
 
 			if err != nil {
@@ -66,34 +67,22 @@ func (s mapAsyncSeq[T, U]) Iterator() iter.Seq2[U, error] {
 			}
 
 			go func(v T) {
-				fmt.Println("👀 going into go func", v, err)
 				defer wg.Done()
 
 				r, err := s.f(v)
 
 				l.Lock()
+				defer l.Unlock()
+
 				select {
 				case <-ctx.Done():
-					fmt.Println("❌ context done", v, err)
 					return
 				default:
-					fmt.Println("🚀 executing yield", v, err)
 					if !yield(r, err) {
-						fmt.Println("💣 cancel context", v, err)
 						cancel()
 					}
 				}
-				l.Unlock()
 			}(v)
-
-			// when I remove this, I run into a deadlock
-			select {
-			case <-ctx.Done():
-				fmt.Println("😱 ctx done", v, err)
-				return
-			default:
-				continue
-			}
 		}
 
 		wg.Wait()
