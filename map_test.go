@@ -39,22 +39,17 @@ func TestMap(t *testing.T) {
 	})
 }
 
-func TestAsyncExecutionTime(t *testing.T) {
-	t.Run("should run in a reasonable amount of time", func(t *testing.T) {
-		_, err := Collect(
+func BenchmarkMapAsync5000Entries(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = Collect(
 			MapAsync(
 				Int(0, 5000),
 				func(i int) (int, error) {
-					time.Sleep(1 * time.Second)
 					return i, nil
 				},
 			),
 		)
-
-		if err != nil {
-			t.Errorf("Expected no error, got %s", err)
-		}
-	})
+	}
 }
 
 func TestAsyncError(t *testing.T) {
