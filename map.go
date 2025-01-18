@@ -45,7 +45,7 @@ func MapAsync[T, U any](s Seq[T], f mapfunc[T, U]) Seq[U] {
 }
 
 // BenchmarkMapAsync5000Entries-8               944           1289784 ns/op          650616 B/op        10053 allocs/op
-func (s mapAsyncSeq[T, U]) IteratorOld() iter.Seq2[U, error] {
+func (s mapAsyncSeq[T, U]) Iterator() iter.Seq2[U, error] {
 	return func(yield func(U, error) bool) {
 		var r U
 		var wg sync.WaitGroup
@@ -87,7 +87,7 @@ func (s mapAsyncSeq[T, U]) IteratorOld() iter.Seq2[U, error] {
 }
 
 // BenchmarkMapAsync5000Entries-8               112          10528610 ns/op          727895 B/op        11679 allocs/op
-func (s mapAsyncSeq[T, U]) Iterator() iter.Seq2[U, error] {
+func (s mapAsyncSeq[T, U]) Iterator2() iter.Seq2[U, error] {
 	return func(yield func(U, error) bool) {
 		var r U
 		var wg sync.WaitGroup
